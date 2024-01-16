@@ -12,7 +12,7 @@ import TrackingModule as tm
 pTime = 0                        #Frame rate(fps)
     cTime = 0
     cap = cv2.VideoCapture(0)       #Webcam config 
-    detector = ObjectDetector()
+    detector = tm.ObjectDetector()
   
     while True:
         success, img = cap.read()   #Read a frame
