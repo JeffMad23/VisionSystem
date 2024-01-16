@@ -1,0 +1,71 @@
+"""
+Author: Jeffrey Madrid 
+Date: Jan 10, 2024
+
+***Palm Tracking Project***
+This python project is to demonstrate palm tracking using openCV and Mediapipe
+It reads an input image, detects the palm and visualizes the results on the image
+
+***Overview***
+- Showcase OpenCV and MediaPipe libraries for computer vision capabilities
+- Visualize location of a palm in an input impage
+
+***NASA Vision System Integration***
+- This project will be a stepping stone for a broader NASA Vision System
+- The Palm Tracking Algorithm will play in crucial role in creating an advanced 
+  computer vision system for our space project 
+
+"""
+import cv2                      #Computer Vision Library(OpenCV)
+import mediapipe as mp          #Vision solutions by Google
+import time                     #Check the framerate
+
+cap = cv2.VideoCapture(0)       #Webcam config 
+#time.sleep(1)                   #Delay before Cameras on
+
+mpHands = mp.solutions.hands
+hands = mpHands.Hands()          #Creating an object  
+mpDraw = mp.solutions.drawing_utils  #solving the 20 points
+pTime = 0                        #Frame rate(fps)
+cTime = 0
+
+while True:
+    success, img = cap.read()   #Read a frame
+
+    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #RGB images
+    results = hands.process(imgRGB) #calling the mehtod within the object and using result to extract it 
+    #print(results.multi_hand_landmarks) #testing, detected or not
+
+    if results.multi_hand_landmarks: #if landmark is true
+        for handLms in results.multi_hand_landmarks:
+            for id, lm in enumerate(handLms.landmark): #index #,id number and landmark coordiantes(x,y,z)
+                #print(id,lm)
+                h, w, c= img.shape #pixel position
+                cx, cy = int(lm.x*w), int(lm.y*h)
+                print(id, cx, cy)
+                if id ==0:
+                    cv2.circle(img, (cx,cy), 15, (0,0,0), cv2.FILLED)
+
+            mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS) #(0)(1) hand, drawing the connections to the 20 points 
+                             
+    if not success or img is None or img.shape[0] <= 0 or img.shape[1] <= 0: 
+        print("\n\tERROR: Failed to read camera frame. ")
+        break                  #Skip to the next iteration if the frame is invalid            
+
+    cTime = time.time()        #Current time
+    fps = 1/(cTime-pTime)      
+    pTime = cTime  
+ 
+    cv2.putText(img,str(int(fps)),(10,70), cv2.FONT_HERSHEY_PLAIN, 3,
+                        (0, 0, 0), 3) #img,convertString, position,font,scale,color,thickness            
+
+    cv2.imshow("Testing", img)  #Current frame            
+
+    key = cv2.waitKey(1)        #Duration           
+    if key == 27:               #'Esc'(ASCII #27) key breaks the loop
+        break
+
+    
+#Release memory
+cap.release()
+cv2.destroyAllWindows()

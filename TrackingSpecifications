@@ -1,0 +1,32 @@
+    pTime = 0                        #Frame rate(fps)
+    cTime = 0
+    cap = cv2.VideoCapture(0)       #Webcam config 
+    detector = ObjectDetector()
+  
+    while True:
+        success, img = cap.read()   #Read a frame
+        img = detector.findObject(img)
+        lmList = detector.findPosition(img)
+        if len(lmList) !=0:    #640 max (x) and 150 min (y) 640x480 pixels
+            print(lmList[4])   #testing which index I want my pixel values at 
+
+        if not success or img is None or img.shape[0] <= 0 or img.shape[1] <= 0: 
+            print("\n\tERROR: Failed to read camera frame. ")
+            continue                  #Skip to the next iteration if the frame is invalid   
+        
+        cTime = time.time()        #Current time
+        fps = 1/(cTime-pTime)      
+        pTime = cTime  
+
+        cv2.putText(img,str(int(fps)),(10,70), cv2.FONT_HERSHEY_PLAIN, 3,
+                            (0, 0, 0), 3) #img,convertString, position,font,scale,color,thickness            
+
+        cv2.imshow("Testing", img)  #Current frame            
+
+        key = cv2.waitKey(1)        #Duration           
+        if key == 27:               #'Esc'(ASCII #27) key breaks the loop
+            break
+
+    #Release memory
+    cap.release()
+    cv2.destroyAllWindows()
