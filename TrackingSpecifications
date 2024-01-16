@@ -1,12 +1,23 @@
-    pTime = 0                        #Frame rate(fps)
+    """
+Author: Jeffrey Madrid 
+Date: Jan 11, 2024
+
+Code CleanUp
+"""
+import cv2                      #Computer Vision Library(OpenCV)
+import mediapipe as mp          #Vision solutions by Google
+import time                     #Check the framerate
+import TrackingModule as tm
+
+pTime = 0                        #Frame rate(fps)
     cTime = 0
     cap = cv2.VideoCapture(0)       #Webcam config 
     detector = ObjectDetector()
   
     while True:
         success, img = cap.read()   #Read a frame
-        img = detector.findObject(img)
-        lmList = detector.findPosition(img)
+        img = detector.findObject(img, draw=False)  #configure your model to have drawing or not
+        lmList = detector.findPosition(img, draw=False) #configure the old drawing to your new parametrs
         if len(lmList) !=0:    #640 max (x) and 150 min (y) 640x480 pixels
             print(lmList[4])   #testing which index I want my pixel values at 
 
